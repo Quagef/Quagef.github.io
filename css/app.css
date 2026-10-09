@@ -3419,39 +3419,36 @@ html.lenis body {
 .index-projects__inner {
     position: relative;
     margin-right: auto;
-    margin-left: auto
-}
-
-@media screen and (max-width: 750px) {
-    .index-projects__inner {
-        max-width: unset;
-        padding-right: 12.5rem;
-        padding-left: 12.5rem;
-        overflow: scroll
-    }
-}
-
-.index-projects__list {
-    display: grid;
-    grid-template-columns: repeat(3, 18.125rem);
-    gap: 1.875rem;
-    justify-content: space-between;
-    height: 68rem;
-    padding-bottom: 6.25rem;
+    margin-left: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     -ms-overflow-style: none;
     scrollbar-width: none
 }
 
-@media screen and (max-width: 750px) {
-    .index-projects__list {
-        position: relative;
-        grid-template-columns: repeat(3, 23.75rem);
-        gap: 6.25rem;
-        height: auto;
-        padding-top: 6.25rem;
-        padding-right: 12.5rem;
-        margin-top: 6.25rem
-    }
+.index-projects__list {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 3rem;
+    width: max-content;
+    padding: 8rem 6.25rem 6.25rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none
+}
+
+.index-projects__line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: visible
+}
+
+.index-projects__item.is-low {
+    margin-top: 4rem
 }
 
 .index-projects__inner::-webkit-scrollbar {
@@ -3459,6 +3456,9 @@ html.lenis body {
 }
 
 .index-projects__item {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 18.125rem;
     height: fit-content;
     backface-visibility: hidden
 }
@@ -3470,7 +3470,8 @@ html.lenis body {
 }
 
 .index-projects__item .card-back {
-    animation: cross-fade-out .4s cubic-bezier(.43, .05, .17, 1) forwards
+    animation: cross-fade-out .4s cubic-bezier(.43, .05, .17, 1) forwards;
+    transform: rotate(2.5deg)
 }
 
 .index-projects__item .card-front:has(+ .card-back.is-click) {
@@ -3490,286 +3491,61 @@ html.lenis body {
     z-index: 1
 }
 
-.index-projects__item--1 {
-    position: absolute;
-    top: -.1875rem;
-    left: 5.8125rem;
-    z-index: 5;
-    margin-top: 0rem
-}
-
 @media screen and (max-width: 750px) {
-    .index-projects__item--1 {
-        position: static;
-        margin-top: 1.5625rem;
-        transform: translate(-.625rem)
+    .index-projects__item .card-back {
+        transform: rotate(2deg)
     }
 }
 
-.index-projects__item--1.is-enter .card-front:not(:has(+ .is-click)) .card-front__hover {
-    animation: a 1.6s cubic-bezier(.51, 0, .56, .99) forwards
+.index-projects__item.is-enter .card-front:not(:has(+ .is-click)) .card-front__hover {
+    animation: poem-front-hover 1.6s cubic-bezier(.51, 0, .56, .99) forwards
 }
 
-@keyframes a {
+.index-projects__item.is-enter .card-back:not(.is-click) .card-back__hover {
+    animation: poem-back-hover 1.7s cubic-bezier(.51, 0, .56, .99) forwards
+}
 
+@keyframes poem-front-hover {
     0%,
     to {
         transform: rotate(0)
     }
-
     20% {
         transform: rotate(-2.5deg)
     }
-
     40% {
         transform: rotate(1deg)
     }
-
     55% {
         transform: rotate(-.5deg)
     }
-
     67.5% {
         transform: rotate(.25deg)
     }
-
     80% {
         transform: rotate(-.2deg)
     }
 }
 
-.index-projects__item--1.is-enter .card-back:not(.is-click) .card-back__hover {
-    animation: b 1.7s cubic-bezier(.51, 0, .56, .99) forwards
-}
-
-@keyframes b {
-
+@keyframes poem-back-hover {
     0%,
     to {
         transform: rotate(0)
     }
-
     20% {
         transform: rotate(-4.5deg)
     }
-
     40% {
         transform: rotate(1.8deg)
     }
-
     55% {
         transform: rotate(-.9deg)
     }
-
     67.5% {
         transform: rotate(.45deg)
     }
-
     80% {
         transform: rotate(-.36deg)
-    }
-}
-
-.index-projects__item--2 {
-    position: absolute;
-    top: 0;
-    left: 36.375rem;
-    z-index: 3;
-    margin-top: 13.25rem
-}
-
-@media screen and (max-width: 750px) {
-    .index-projects__item--2 {
-        position: static;
-        margin-top: -2.6875rem;
-        transform: translate(-.9375rem)
-    }
-}
-
-.index-projects__item--2.is-enter .card-front:not(:has(+ .is-click)) .card-front__hover {
-    animation: c 1.5s cubic-bezier(.51, 0, .56, .99) forwards
-}
-
-@keyframes c {
-
-    0%,
-    to {
-        transform: rotate(0)
-    }
-
-    20% {
-        transform: rotate(-1.5deg)
-    }
-
-    40% {
-        transform: rotate(.6deg)
-    }
-
-    55% {
-        transform: rotate(-.3deg)
-    }
-
-    67.5% {
-        transform: rotate(.15deg)
-    }
-
-    80% {
-        transform: rotate(-.12deg)
-    }
-}
-
-.index-projects__item--2.is-enter .card-back:not(.is-click) .card-back__hover {
-    animation: d 1.68s cubic-bezier(.51, 0, .56, .99) forwards
-}
-
-@keyframes d {
-
-    0%,
-    to {
-        transform: rotate(0)
-    }
-
-    20% {
-        transform: rotate(-3.3deg)
-    }
-
-    40% {
-        transform: rotate(1.32deg)
-    }
-
-    55% {
-        transform: rotate(-.66deg)
-    }
-
-    67.5% {
-        transform: rotate(.33deg)
-    }
-
-    80% {
-        transform: rotate(-.264deg)
-    }
-}
-
-.index-projects__item--3 {
-    position: absolute;
-    top: 0;
-    left: 65.875rem;
-    z-index: 1;
-    margin-top: 2.9375rem
-}
-
-@media screen and (max-width: 750px) {
-    .index-projects__item--3 {
-        position: static;
-        margin-top: 1.5625rem;
-        transform: translate(-1.875rem)
-    }
-}
-
-.index-projects__item--3.is-enter .card-front:not(:has(+ .is-click)) .card-front__hover {
-    animation: e 1.5s cubic-bezier(.51, 0, .56, .99) forwards
-}
-
-@keyframes e {
-
-    0%,
-    to {
-        transform: rotate(0)
-    }
-
-    20% {
-        transform: rotate(-1.5deg)
-    }
-
-    40% {
-        transform: rotate(.6deg)
-    }
-
-    55% {
-        transform: rotate(-.3deg)
-    }
-
-    67.5% {
-        transform: rotate(.15deg)
-    }
-
-    80% {
-        transform: rotate(-.12deg)
-    }
-}
-
-.index-projects__item--3.is-enter .card-back:not(.is-click) .card-back__hover {
-    animation: f 1.7s cubic-bezier(.51, 0, .56, .99) forwards
-}
-
-@keyframes f {
-
-    0%,
-    to {
-        transform: rotate(0)
-    }
-
-    20% {
-        transform: rotate(-1deg)
-    }
-
-    40% {
-        transform: rotate(.4deg)
-    }
-
-    55% {
-        transform: rotate(-.2deg)
-    }
-
-    67.5% {
-        transform: rotate(.1deg)
-    }
-
-    80% {
-        transform: rotate(-.08deg)
-    }
-}
-
-.index-projects__item--1 .card-front {
-    transform: rotate(0)
-}
-
-.index-projects__item--1 .card-back {
-    z-index: -1;
-    transform: rotate(3.8deg)
-}
-
-@media screen and (max-width: 750px) {
-    .index-projects__item--1 .card-back {
-        transform: rotate(2.9deg)
-    }
-}
-
-.index-projects__item--2 .card-front {
-    transform: rotate(0)
-}
-
-.index-projects__item--2 .card-back {
-    transform: rotate(-4deg)
-}
-
-@media screen and (max-width: 750px) {
-    .index-projects__item--2 .card-back {
-        transform: rotate(-2deg)
-    }
-}
-
-.index-projects__item--3 .card-front {
-    transform: rotate(0)
-}
-
-.index-projects__item--3 .card-back {
-    transform: rotate(3.8deg)
-}
-
-@media screen and (max-width: 750px) {
-    .index-projects__item--3 .card-back {
-        transform: rotate(-3deg)
     }
 }
 
