@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>app.js 到底加载了哪个版本</title>
+<style>
+  body { margin: 0; font: 15px/1.7 ui-monospace, Menlo, monospace; background: #111; color: #0f0; }
+  #out { padding: 12px; white-space: pre-wrap; font-size: 17px; }
+  #out b { color: #ff0; }
+  iframe { width: 100%; height: 45vh; border: 2px solid #f00; display: block; }
+  .hint { color: #888; padding: 0 12px 8px; }
+</style>
+</head>
+<body>
+<div id="out">running…（约 4~6 秒，请勿关闭）</div>
+<div class="hint">上面框里是你要复现的页面。把下面绿色文字整段发我。</div>
+<iframe id="f" src="index.html"></iframe>
+<script>
+(function () {
+  var f = document.getElementById('f'), o = document.getElementById('out'), lines = [];
+  function log(s) {
+    lines.push(s); o.innerHTML = lines.join('\n');
+    try { (new Image()).src = '/__r?' + encodeURIComponent(String(s).replace(/<[^>]+>/g, '')); } catch (e) {}
+  }
+  // 已知指纹（32 位乘法散列）：当前磁盘文件 = 见 FIXED，git 旧文件 = 见 OLD
+  var FIXED = '5da47c37', OLD = 'ac337a89';
+  function hash(s) {
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) { h = ((h * 33) + s.charCodeAt(i)) >>> 0; }
+    return ('0000000' + h.toString(16)).slice(-8);
+  }
+  function fingerprint(tag, url, extraHeaders) {
+    var x = new XMLHttpRequest();
+    x.open('GET', url, false);
+    if (extraHeaders) for (var k in extraHeaders) { try { x.setRequestHeader(k, extraHeaders[k]); } catch (e) {} }
+    try { x.send(); } catch (e) { log(tag + ': XHR 失败 ' + e); return 'ERR'; }
+    var t = x.responseText || '';
+    var hasFix = t.indexOf('if (!s || !t) return;') > -1;
+    var hasOldMarker = t.indexOf('min - width') > -1;
+    var h = hash(t);
+    var guess = (h === FIXED) ? 'FIXED(已修复)' : ((h === OLD) ? 'OLD(旧文件)' : (hasFix ? 'FIXED?' : (hasOldMarker ? 'OLD?' : '??未知')));
+    log(tag + '  hash=' + h + '  hasFix=' + hasFix + '  hasOldMarker=' + hasOldMarker + '  => <b>' + guess + '</b>');
+    return guess;
+  }
+
+  var ierr = [];
+  f.addEventListener('load', function () {
+    var w = f.contentWindow, d = f.contentDocument;
+    try { w.addEventListener('error', function (ev) { ierr.push((ev.message || '') + ' @' + ev.lineno); }); } catch (e) {}
+    setTimeout(function () {
+      try {
+        log('innerWidth=' + w.innerWidth + '  mq751=' + w.matchMedia('(min-width:751px)').matches +
+            '  allSpacers=' + d.querySelectorAll('.pin-spacer').length + '  (3=没pin  6=有pin)');
+        log('script标签 src = ' + (d.querySelector('script[src*="app.js"]') || {}).src);
+        log('serviceWorker.controller = ' + (navigator.serviceWorker && navigator.serviceWorker.controller ? 'YES(有SW缓存!)' : 'null'));
+        var e = (w.performance.getEntriesByType('resource') || []).filter(function (r) { return /app\.js/.test(r.name); })[0];
+        if (e) log('资源计时: transferSize=' + e.transferSize + '(0=来自缓存/未走网络)  decodedBodySize=' + e.decodedBodySize + '  initiatorType=' + e.initiatorType);
+        var tag = d.querySelector('script[src*="app.js"]');
+        var tagSrc = tag ? tag.getAttribute('src') : 'script/app.js';
+        log('---- A) 页面 script 标签实际用的那个 URL（' + tagSrc + '）----');
+        var A = fingerprint('A)  ', tagSrc);
+        log('---- B) 加时间戳 + no-cache：绕过缓存后服务器给的文件 ----');
+        var B = fingerprint('B)  ', 'script/app.js?nocache=' + Date.now(), { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' });
+        log('---- 怎么读上面两行 ----');
+        if (A.indexOf('OLD') === 0 && B.indexOf('FIXED') === 0) log('★ A=OLD 且 B=FIXED → 浏览器缓存问题（硬刷新 Cmd+Shift+R 或 DevTools 勾 Disable cache 即可）');
+        else if (A.indexOf('OLD') === 0 && B.indexOf('OLD') === 0) log('★ A=OLD 且 B=OLD → 你的 HTTP 根目录指向的是另一份旧文件，不是这个仓库');
+        else log('★ A 和 B 都是 FIXED → 文件已是新版；若下面滚动测试仍是 static，就是运行时 JS 错误（看最后的报错行）');
+        // 顺带跑一遍滚动，看第一段会不会停住
+        var it = d.querySelector('.js-business-item');
+        if (w.LENIS && it) {
+          try { w.LENIS.start(); } catch (e) {}
+          log('---- 滚动测试（position=fixed 才是停住了）----');
+          var ys = [300, 1200, 1500, 1800, 2200, 2600], i = 0;
+          (function step() {
+            if (i >= ys.length) {
+              log('iframe JS错误: ' + (ierr.length ? ierr.join(' | ') : '无'));
+              log('---- 结束，把这整段发我 ----');
+              return;
+            }
+            try { w.LENIS.scrollTo(ys[i], { immediate: true }); } catch (e) {}
+            setTimeout(function () {
+              log('  scroll=' + ys[i] + ' realY=' + Math.round(w.scrollY) +
+                  ' position=' + w.getComputedStyle(it).position +
+                  ' top=' + Math.round(it.getBoundingClientRect().top));
+              i++; step();
+            }, 350);
+          })();
+        } else {
+          log('无法滚动测试：LENIS=' + !!w.LENIS + ' item=' + !!it);
+          log('---- 结束，把这整段发我 ----');
+        }
+      } catch (err) { log('顶层异常: ' + err.message); }
+    }, 2500);
+  });
+})();
+</script>
+</body>
+</html>

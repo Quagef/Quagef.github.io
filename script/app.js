@@ -5841,10 +5841,7 @@ var xe, lc, cc = function () {
             const s = () => {
                 location.reload()
             };
-            window.matchMedia(` (min - width: ${
-                rr.SP
-            }
-            px)`).addEventListener("change", s)
+            window.matchMedia(`(min-width:${rr.SP}px)`).addEventListener("change", s)
         },
         Sf = () => {
             const s = document.querySelector(".js-global-hamburger-menu-btn"),
@@ -7774,10 +7771,7 @@ var Wa = function (t, e, i, r) {
                 px top`
                 };
             t.forEach((i, r) => {
-                Ps.add(` (min - width: ${
-                    rr.SP
-                }
-                px)`, () => {
+                Ps.add(`(min-width:${rr.SP}px)`, () => {
                     const n = q.create({
                         trigger: i,
                         start: () => e(r),
@@ -7806,10 +7800,7 @@ var Wa = function (t, e, i, r) {
                     return r > rr.TAB ? `-${u+c*i+d}px top`: ` -${l*(i+1)+d}px top`
                 };
             t.forEach((i, r) => {
-                Ps.add(` (min - width: ${
-                    rr.SP
-                }
-                px)`, () => {
+                Ps.add(`(min-width:${rr.SP}px)`, () => {
                     const n = q.create({
                         trigger: i,
                         start: () => e(r),
@@ -7826,10 +7817,8 @@ var Wa = function (t, e, i, r) {
         Hf = () => {
             const s = document.querySelector(".js-index-profile-we-are-title"),
                 t = document.querySelector(".js-index-profile-we-are-image");
-            Ps.add(` (min - width: ${
-                rr.SP
-            }
-            px)`, () => {
+            if (!s || !t) return;
+            Ps.add(`(min-width:${rr.SP}px)`, () => {
                 const e = q.create({
                     start: () => "top 50%",
                     end: () => "top 50%",
